@@ -8,6 +8,7 @@ let complete;
 let incomplete;
 let Taskall;
 let newTask;
+let Task;
 
 const fetchdata = fetch(url)
 
@@ -16,37 +17,10 @@ fetchdata.then((Response) => {
     // console.log('formated responce',data);
     return data;
 }).then((data) => {
-    let Task = data.slice(0, 10)
+     Task = data.slice(0, 10)
     // console.log('my Array',Task);
     printTodos(Task)
     return Task;
-}).then((Task) => {
-    button.addEventListener('click',(e) => {
-        e.preventDefault();
-
-        newTask = {
-            title: input.value,
-            completed: false,
-            userId: 1
-        }
-
-        console.log(newTask);
-        Task.unshift(newTask)
-        printTodos(Task)
-        input.value = ''
-    })
-
-    return Task;
-
-
-}).then((Task) => {
-    complete = Task.filter(el => el.completed === true)
-    // console.log("completed Task",complete);
-    return Task
-}).then((Task) => {
-    incomplete = Task.filter(el => el.completed === false)
-    // console.log("incompleted Task",incomplete);
-    return Task
 }).then((Task) => {
 
     printTodos(Task)
@@ -82,7 +56,7 @@ function printTodos(Task) {
 
 statusComplete.addEventListener('click', (event) => {
     event.preventDefault();
-
+    complete = Task.filter(el => el.completed === true)
     printTodos(complete)
 
 })
@@ -96,7 +70,35 @@ all.addEventListener('click', (Event) => {
 
 statusIncomplete.addEventListener('click', (event) => {
     event.preventDefault();
-
+    incomplete = Task.filter(el => el.completed === false)
     printTodos(incomplete)
 
+})
+
+
+function addData(newTask) {
+    fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(newTask),
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+        }
+    }).then((response) => response.json())
+        .then((json) => console.log(json));
+}
+
+
+
+button.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    newTask = {
+        title: input.value,
+        completed: false,
+        userId: 1
+    }
+
+    Task.unshift(newTask)
+    printTodos(Task)
+    input.value = ''
 })
