@@ -17,7 +17,7 @@ fetchdata.then((Response) => {
     // console.log('formated responce',data);
     return data;
 }).then((data) => {
-     Task = data.slice(0, 10)
+    Task = data.slice(0, 100)
     // console.log('my Array',Task);
     printTodos(Task)
     return Task;
@@ -39,11 +39,14 @@ let statusIncomplete = document.querySelector(".status-incomplete")
 
 function printTodos(Task) {
     let result = ''
-    Task.map(el => {
+    Task.map((el, index) => {
         result += `
             <div class="todo-div">
             <span>${el.title}</span>
-            <span>${el.completed}</span>
+            <span><input type="checkbox" ${el.completed && "checked"} onclick="handleClick(${index})"/></span> 
+
+
+
             </div>
            
             
@@ -78,7 +81,7 @@ statusIncomplete.addEventListener('click', (event) => {
 
 function addData(newTask) {
     fetch(url, {
-        method: 'POST',
+        method: 'PUT',
         body: JSON.stringify(newTask),
         headers: {
             'Content-type': 'application/json; charset=UTF-8',
@@ -98,7 +101,45 @@ button.addEventListener('click', (e) => {
         userId: 1
     }
 
-    Task.unshift(newTask)
-    printTodos(Task)
-    input.value = ''
+    // Task.unshift(newTask)
+    // printTodos(Task)
+    // input.value = ''
+    AddtoApi(newTask)
 })
+
+
+function handleClick(e) {
+    Task[e].completed = !Task[e].completed//wisdom
+    
+
+    fetch(`https://jsonplaceholder.typicode.com/todos/${e}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+            // completed:true
+            Task
+        }),
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+        },
+    })
+        .then((response) => response.json())
+        .then((json) => console.log(json));
+
+        printTodos(Task)
+}
+
+function AddtoApi(newTask) {
+    fetch('https://jsonplaceholder.typicode.com/todos', {
+        method: 'POST',
+        body: JSON.stringify({
+            title: newTask.title,
+            completed: newTask.completed,
+            userId: newTask.userId,
+        }),
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+        },
+    })
+        .then((response) => response.json())
+        .then((json) => console.log(json));
+}
